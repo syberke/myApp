@@ -3,8 +3,11 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { router } from 'expo-router';
 import { BookOpen, Building2, CloudUpload, Home, HousePlus, ListChecks, Monitor, Plus , Shield, Trophy, User } from 'lucide-react-native';
 import React, { useEffect } from 'react';
-import { Platform } from 'react-native';
+import { Platform, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { FadeInUp } from 'react-native-reanimated';
+
+const { width } = Dimensions.get('window');
 
 // Import screen components (pastikan path sesuai struktur project kamu)
 import admin from './admin';
@@ -88,15 +91,25 @@ export default function TabsLayout() {
         tabBarInactiveTintColor: '#9CA3AF',
         tabBarStyle: {
           backgroundColor: 'white',
-          borderTopWidth: 1,
-          borderTopColor: '#E5E7EB',
-          paddingBottom: Platform.OS === 'ios' ? insets.bottom : 8,
-          paddingTop: 8,
-          height: Platform.OS === 'ios' ? 70 + insets.bottom : 70,
+          borderTopWidth: 0,
+          paddingBottom: Platform.OS === 'ios' ? insets.bottom + 8 : 12,
+          paddingTop: 12,
+          height: Platform.OS === 'ios' ? 80 + insets.bottom : 80,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
+          elevation: 10,
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: width < 380 ? 10 : 12,
           fontWeight: '600',
+          marginTop: 4,
+        },
+        tabBarIconStyle: {
+          marginTop: 4,
         },
       }}
     >
