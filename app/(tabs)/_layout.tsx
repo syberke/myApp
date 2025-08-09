@@ -1,7 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { router } from 'expo-router';
-import { BookOpen, Building2, CloudUpload, Home, HousePlus, ListChecks, Monitor, Plus , Shield, Trophy, User } from 'lucide-react-native';
+import { BookOpen, Building2, CloudUpload, Chrome as Home, HousePlus, ListChecks, Monitor, Plus, Shield, Trophy, User } from 'lucide-react-native';
 import React, { useEffect } from 'react';
 import { Platform, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
