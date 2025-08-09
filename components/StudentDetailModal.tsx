@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, TextInput, Alert, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, TextInput, Alert, Modal, Dimensions } from 'react-native';
 import { supabase } from '@/lib/supabase';
+import { AudioPlayer } from '@/components/AudioPlayer';
 import { X, User, BookOpen, Target, Award, CreditCard as Edit, Save, Play, FileAudio } from 'lucide-react-native';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+
+const { width } = Dimensions.get('window');
 
 interface StudentDetailModalProps {
   visible: boolean;
@@ -127,7 +131,7 @@ export function StudentDetailModal({ visible, studentId, studentName, onClose, i
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Detail Siswa</Text>
           <Pressable onPress={onClose} style={styles.closeButton}>
-            <X size={24} color="#6B7280" />
+            <X size={24} color="white" />
           </Pressable>
         </View>
 
@@ -276,15 +280,11 @@ export function StudentDetailModal({ visible, studentId, studentName, onClose, i
                           <Text style={styles.setoranNote}>Catatan: {setoran.catatan}</Text>
                         )}
 
-                        {/* Audio Player */}
-                        <Pressable 
-                          style={styles.audioButton}
-                          onPress={() => playAudio(setoran.file_url)}
-                        >
-                          <FileAudio size={16} color="#10B981" />
-                          <Text style={styles.audioButtonText}>Putar Audio</Text>
-                          <Play size={14} color="#10B981" />
-                        </Pressable>
+                        {/* Enhanced Audio Player */}
+                        <AudioPlayer 
+                          fileUrl={setoran.file_url}
+                          title={`${setoran.jenis} - ${setoran.surah}`}
+                        />
                       </View>
                     ))}
                   </View>
@@ -305,7 +305,7 @@ export function StudentDetailModal({ visible, studentId, studentName, onClose, i
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#F8FAFC',
   },
   header: {
     flexDirection: 'row',
@@ -313,20 +313,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     paddingTop: 60,
-    backgroundColor: 'white',
+    backgroundColor: '#8B5CF6',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: 'transparent',
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 10,
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: 'white',
   },
   closeButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#F3F4F6',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.2)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -348,34 +355,40 @@ const styles = StyleSheet.create({
   },
   studentInfo: {
     backgroundColor: 'white',
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 24,
     alignItems: 'center',
     marginBottom: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowRadius: 12,
+    elevation: 5,
   },
   studentAvatar: {
-    width: 64,
-    height: 64,
-    backgroundColor: '#10B981',
-    borderRadius: 32,
+    width: 80,
+    height: 80,
+    backgroundColor: '#8B5CF6',
+    borderRadius: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   studentName: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#1F2937',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   studentEmail: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#6B7280',
+    fontWeight: '500',
   },
   statsGrid: {
     flexDirection: 'row',
@@ -385,26 +398,27 @@ const styles = StyleSheet.create({
   },
   statCard: {
     backgroundColor: 'white',
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 16,
     alignItems: 'center',
     gap: 8,
-    width: '47%',
+    width: Math.min(width * 0.44, 180),
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowRadius: 12,
+    elevation: 5,
   },
   statNumber: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#1F2937',
   },
   statLabel: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#6B7280',
     textAlign: 'center',
+    fontWeight: '600',
   },
   section: {
     marginBottom: 16,
@@ -416,17 +430,22 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#1F2937',
   },
   editButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: '#DBEAFE',
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   editContainer: {
     flexDirection: 'row',
@@ -453,24 +472,25 @@ const styles = StyleSheet.create({
   },
   hafalanDisplay: {
     backgroundColor: 'white',
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 20,
     alignItems: 'center',
     gap: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowRadius: 12,
+    elevation: 5,
   },
   hafalanNumber: {
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: 'bold',
     color: '#10B981',
   },
   hafalanLabel: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#6B7280',
+    fontWeight: '600',
   },
   progressCards: {
     flexDirection: 'row',
@@ -479,54 +499,61 @@ const styles = StyleSheet.create({
   progressCard: {
     flex: 1,
     backgroundColor: 'white',
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 16,
     alignItems: 'center',
     gap: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowRadius: 12,
+    elevation: 5,
   },
   progressTitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#1F2937',
   },
   progressNumber: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#10B981',
   },
   progressLabel: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#6B7280',
     textAlign: 'center',
+    fontWeight: '600',
   },
   emptyState: {
     backgroundColor: 'white',
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 32,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
   },
   emptyText: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#6B7280',
     marginTop: 12,
+    fontWeight: '600',
   },
   setoranList: {
     gap: 8,
   },
   setoranCard: {
     backgroundColor: 'white',
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowRadius: 12,
+    elevation: 5,
   },
   setoranHeader: {
     flexDirection: 'row',
@@ -535,22 +562,22 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   setoranType: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
   },
   setoranTypeText: {
     color: 'white',
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '700',
   },
   statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
   },
   statusText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
   },
   setoranTitle: {
@@ -574,19 +601,5 @@ const styles = StyleSheet.create({
     color: '#374151',
     fontStyle: 'italic',
     marginBottom: 8,
-  },
-  audioButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: '#F0FDF4',
-    padding: 12,
-    borderRadius: 8,
-    justifyContent: 'center',
-  },
-  audioButtonText: {
-    fontSize: 14,
-    color: '#10B981',
-    fontWeight: '600',
   },
 });
